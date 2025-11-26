@@ -1,10 +1,12 @@
 [build-system]
-requires = ["setuptools", "wheel"]
+requires = ["setuptools", "wheel", "setuptools-scm"]
 build-backend = "setuptools.build_meta"
+
+[tool.setuptools_scm]
+write_to = "mypackage/_version.py"
 
 [project]
 name = "test-package"
-version = "0.1.0"
 description = "A simple test package for uploading to private PyPI servers"
 authors = [
     {name = "Test Author", email = "test@example.com"},

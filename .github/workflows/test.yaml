@@ -24,7 +24,7 @@ jobs:
       - name: Install build tools
         run: |
           python -m pip install --upgrade pip
-          pip install build
+          pip install build setuptools-scm
 
       - name: Build package
         run: python -m build
@@ -36,14 +36,8 @@ jobs:
           AWS_REGION: us-east-2
           BUCKET_NAME: test-pypi-directory
         run: |
-          # Determine prefix based on branch/tag
-          if [[ "$GITHUB_REF" == refs/heads/main ]]; then
-            aws s3 cp dist/ s3://$BUCKET_NAME/packages/mypackage --recursive
-          elif [[ "$GITHUB_REF" == refs/heads/feature/* ]]; then
-            aws s3 cp dist/ s3://$BUCKET_NAME/packages/mypackage-dev --recursive
-          elif [[ "$GITHUB_REF" == refs/tags/* ]]; then
+          if [[ "$GITHUB_REF" == refs/heads/main ]] || [[ "$GITHUB_REF" == refs/tags/* ]]; then
             aws s3 cp dist/ s3://$BUCKET_NAME/packages/mypackage --recursive
           else
             aws s3 cp dist/ s3://$BUCKET_NAME/packages/mypackage-dev --recursive
           fi
-          
