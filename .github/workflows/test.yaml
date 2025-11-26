@@ -7,6 +7,9 @@ on:
       - feature/*
     tags:
       - 'v*.*.*'
+  pull_request:
+    branches:
+      - main
 
 jobs:
   build-and-deploy:
@@ -29,15 +32,21 @@ jobs:
       - name: Build package
         run: python -m build
 
-      - name: Upload Package to S3
+      - name: Upload to mypackage-dev
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_REGION: us-east-2
           BUCKET_NAME: test-pypi-directory
         run: |
-          if [[ "$GITHUB_REF" == refs/heads/main ]] || [[ "$GITHUB_REF" == refs/tags/* ]]; then
-            aws s3 cp dist/ s3://$BUCKET_NAME/packages/mypackage --recursive
-          else
-            aws s3 cp dist/ s3://$BUCKET_NAME/packages/mypackage-dev --recursive
-          fi
+          echo "Uploading from ref: $GITHUB_REF"
+          aws s3 cp dist/ s3://$BUCKET_NAME/mypackage-dev --recursive
+
+      - name: Upload to mypackage
+        if: github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/')
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: us-east-2
+          BUCKET_NAME: test-pypi-directory
+        run: aws s3 cp dist/ s3://$BUCKET_NAME/mypackage --recursive
