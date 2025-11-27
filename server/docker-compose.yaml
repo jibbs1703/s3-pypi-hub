@@ -1,8 +1,20 @@
+name: Lamda-Farm-PyPi
 services:
-  pypi-server:
+  main-server:
     image: pypiserver/pypiserver:latest
     ports:
       - 8080:8080
+    volumes:
+      - type: volume
+        source: pypi-server
+        target: /data/packages
+    command: -P . -a . /data/packages
+    restart: always
+
+  dev-server:
+    image: pypiserver/pypiserver:latest
+    ports:
+      - 8081:8080
     volumes:
       - type: volume
         source: pypi-server
