@@ -19,6 +19,13 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Create initial tag v0.0.0 if missing
+        run: |
+          if ! git tag -l | grep -q "^v0.0.0$"; then
+            echo "No tags found → creating v0.0.0"
+            git tag v0.0.0
+          fi
+
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
@@ -53,16 +60,6 @@ jobs:
         with:
           files: dist/*
           generate_release_notes: true
-          prerelease: ${{ steps.version.outputs.prerelease == 'true' }}
-          name: |
-            ${{ 
-              startsWith(github.ref, 'refs/tags/v') 
-              && github.ref_name 
-              || format('dev-{0}', github.sha) 
-            }}
-          tag_name: |
-            ${{ 
-              startsWith(github.ref, 'refs/tags/v') 
-              && github.ref_name 
-              || format('dev-{0}', github.sha) 
-            }}
+          prerelease: ${{ !startsWith(github.ref, 'refs/tags/v') }}
+          name: ${{ startsWith(github.ref, 'refs/tags/v') && github.ref_name || format('dev-{0}', github.sha) }}
+          tag_name: ${{ startsWith(github.ref, 'refs/tags/v') && github.ref_name || format('dev-{0}', github.sha) }}
