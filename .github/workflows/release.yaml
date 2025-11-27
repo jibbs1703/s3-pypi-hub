@@ -1,9 +1,11 @@
-name: Release to GitHub Only
+name: Publish to GitHub Releases
 
 on:
   push:
     tags:
       - "v*.*.*"
+    branches:
+      - main
 
 permissions:
   contents: write
@@ -12,7 +14,7 @@ jobs:
   build-and-release:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
+      - name: Checkout code
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
@@ -21,46 +23,46 @@ jobs:
         uses: actions/setup-python@v4
         with:
           python-version: "3.13"
-
-      - name: Install build
-        run: python -m pip install --upgrade build setuptools setuptools-scm
+      
+      - name: Derive version & release type
+        id: version
+        run: |
+          if [[ $GITHUB_REF == refs/tags/v* ]]; then
+            echo "release_type=stable" >> $GITHUB_OUTPUT
+            echo "prerelease=false" >> $GITHUB_OUTPUT
+          else
+            echo "release_type=dev" >> $GITHUB_OUTPUT
+            echo "prerelease=true" >> $GITHUB_OUTPUT
+          fi
 
       - name: Install build tools
         run: |
-            python -m pip install --upgrade pip
-            pip install build twine setuptools setuptools_scm
+          python -m pip install --upgrade pip
+          pip install build setuptools setuptools_scm[toml] twine
 
       - name: Build package
+        run: python -m build testpackage
+
+      - name: Verify built packages
         run: |
-            python -m build testpackage
-    
+          ls -la testpackage/dist/
+          twine check testpackage/dist/*
+
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
           files: dist/*
           generate_release_notes: true
-        
-    # TODO: Try out multi-package releases later
-    #   - name: Find all packages with pyproject.toml
-    #     id: pkgs
-    #     run: |
-    #       mapfile -t dirs < <(find . -name pyproject.toml -exec dirname {} \; | sort)
-    #       echo "Found ${#dirs[@]} package(s): ${dirs[*]}"
-    #       echo "packages=${dirs[*]}" >> "$GITHUB_OUTPUT"
-
-    #   - name: Build all packages and collect artifacts
-    #     run: |
-    #       mkdir -p dist/all
-    #       for dir in ${{ steps.pkgs.outputs.packages }}; do
-    #         echo "Building $dir"
-    #         (cd "$dir" && python -m build)
-    #         cp "$dir"/dist/* dist/all/
-    #       done
-    #       echo "All built artifacts:"
-    #       ls -lh dist/all/
-
-    #   - name: Create GitHub Release with assets
-    #     uses: softprops/action-gh-release@v2
-    #     with:
-    #       files: dist/all/*
-    #       generate_release_notes: true
+          prerelease: ${{ steps.version.outputs.prerelease == 'true' }}
+          name: |
+            ${{ 
+              startsWith(github.ref, 'refs/tags/v') 
+              && github.ref_name 
+              || format('dev-{0}', github.sha) 
+            }}
+          tag_name: |
+            ${{ 
+              startsWith(github.ref, 'refs/tags/v') 
+              && github.ref_name 
+              || format('dev-{0}', github.sha) 
+            }}

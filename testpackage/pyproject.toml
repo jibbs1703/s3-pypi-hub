@@ -7,18 +7,11 @@ readme = "README.md"
 requires-python = ">=3.13"
 authors = [{name = "Abraham Ajibade", email = "abraham0ajibade@gmail.com"}]
 maintainers = [{name = "Abraham Ajibade", email = "abraham0ajibade@gmail.com"}]
-classifiers = ["Programming Language :: Python :: 3.13"]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.13",
+]
 dependencies = ["python-dotenv==1.0.1"]
-
-[build-system]
-requires = ["setuptools", "setuptools_scm"]
-build-backend = "setuptools.build_meta"
-
-[tool.setuptools_scm]
-version_scheme = "release-branch-semver"
-local_scheme = "node-and-date"
-fallback_version = "0.0.0"
-write_to = "testpackage/_version.py"
 
 [project.optional-dependencies]
 dev = [
@@ -27,15 +20,14 @@ dev = [
     "ruff>=0.14.0",
 ]
 
-[tool.setup.packages.find]
-where = "."
-
-[tool.pytest.ini-options]
-markers = ["unit: mark a test as a unit test"]
-testpaths = "tests"
-
 [project.scripts]
 greet = "testpackage.greet:Greet"
 
-[tool.coverage.run]
-omit = ["tests/*", "*/__init__.py"]
+[build-system]
+requires = ["setuptools", "wheel", "setuptools_scm[toml]"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools_scm]
+version_scheme = "release-branch-semver"
+local_scheme = "no-local-version"
+write_to = "testpackage/_version.py"
