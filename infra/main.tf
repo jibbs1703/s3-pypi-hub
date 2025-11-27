@@ -30,7 +30,6 @@ resource "aws_security_group" "pypi_server_sg" {
   }
 }
 
-# EC2 instance
 resource "aws_instance" "pypi_server" {
   ami           = var.ami_id
   instance_type = var.instance_type

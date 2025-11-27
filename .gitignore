@@ -6,6 +6,7 @@ __pycache__/
 # Private Key Files
 *.pem
 *.key
+second.yaml
 
 # C extensions
 *.so
