@@ -1,4 +1,3 @@
-name: Lamda-Farm-PyPi
 services:
   main-server:
     image: pypiserver/pypiserver:latest
@@ -8,7 +7,10 @@ services:
       - type: volume
         source: pypi-main-server
         target: /data/packages
-    command: -P . -a . /data/packages
+      - type: bind
+        source: ./.htpasswd
+        target: /data/.htpasswd
+    command: run -P file:/data/.htpasswd -a update /data/packages
     restart: always
 
   dev-server:
@@ -19,7 +21,10 @@ services:
       - type: volume
         source: pypi-dev-server
         target: /data/packages
-    command: -P . -a . /data/packages
+      - type: bind
+        source: ./.htpasswd
+        target: /data/.htpasswd
+    command: run -P file:/data/.htpasswd -a update /data/packages
     restart: always
 
 volumes:
