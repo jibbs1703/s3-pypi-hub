@@ -1,4 +1,3 @@
-# Security group for the EC2 instance
 resource "aws_security_group" "pypi_server_sg" {
   name_prefix = "pypi-server-sg-"
 
@@ -11,9 +10,17 @@ resource "aws_security_group" "pypi_server_sg" {
   }
 
   ingress {
-    description = "PyPI Server"
+    description = "PyPI Server Main"
     from_port   = 8080
     to_port     = 8080
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
+    description = "PyPI Server Dev"
+    from_port   = 8081
+    to_port     = 8081
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
