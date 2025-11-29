@@ -1,5 +1,6 @@
 """A simple greeting module."""
 
+
 class Greet:
     """A simple class to perform a greeting."""
 

@@ -24,5 +24,5 @@ dev = [
 greet = "testpackage.greet:Greet"
 
 [build-system]
-requires = ["setuptools", "wheel", "setuptools_scm[toml]"]
+requires = ["setuptools", "wheel", "setuptools_scm"]
 build-backend = "setuptools.build_meta"

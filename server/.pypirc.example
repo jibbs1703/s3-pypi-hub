@@ -1,0 +1,14 @@
+[distutils]
+index-servers = 
+    pypi-main
+    pypi-dev
+
+[pypi-main]
+repository: http://insert-ip-address-here:8080/
+username: insert-username-here
+password: insert-password-here
+
+[pypi-dev]
+repository: http://insert-ip-address-here:8081/
+username: insert-username-here
+password: insert-password-here
